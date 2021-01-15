@@ -17,18 +17,18 @@
 
 import events = require('events');
 import tds = require('tedious');
-export interface ISqlType {
+export interface ISqlType<T = any> {
     type: ISqlTypeFactory;
 }
-export interface ISqlTypeWithNoParams extends ISqlType { type: ISqlTypeFactoryWithNoParams }
+export interface ISqlTypeWithNoParams<T = any> extends ISqlType<T> { type: ISqlTypeFactoryWithNoParams<T> }
 export interface ISqlTypeWithLength extends ISqlType { type: ISqlTypeFactoryWithLength; length: number }
 export interface ISqlTypeWithScale extends ISqlType { type: ISqlTypeFactoryWithScale; scale: number }
 export interface ISqlTypeWithPrecisionScale extends ISqlType { type: ISqlTypeFactoryWithPrecisionScale; precision: number, scale: number }
 export interface ISqlTypeWithTvpType extends ISqlType { type: ISqlTypeFactoryWithTvpType; tvpType: any }
 
-export interface ISqlTypeFactory {
+export interface ISqlTypeFactory<T = any> {
 }
-export interface ISqlTypeFactoryWithNoParams extends ISqlTypeFactory { (): ISqlTypeWithNoParams; }
+export interface ISqlTypeFactoryWithNoParams<T = any> extends ISqlTypeFactory<T> { (): ISqlTypeWithNoParams<T>; }
 export interface ISqlTypeFactoryWithLength extends ISqlTypeFactory { (length?: number): ISqlTypeWithLength }
 export interface ISqlTypeFactoryWithScale extends ISqlTypeFactory { (scale?: number): ISqlTypeWithScale }
 export interface ISqlTypeFactoryWithPrecisionScale extends ISqlTypeFactory { (precision?: number, scale?: number): ISqlTypeWithPrecisionScale; }
@@ -48,10 +48,10 @@ export declare var Numeric: ISqlTypeFactoryWithPrecisionScale;
 export declare var Decimal: ISqlTypeFactoryWithPrecisionScale;
 export declare var Real: ISqlTypeFactoryWithNoParams;
 export declare var Date: ISqlTypeFactoryWithNoParams;
-export declare var DateTime: ISqlTypeFactoryWithNoParams;
+export declare var DateTime: ISqlTypeFactoryWithNoParams<Date>;
 export declare var DateTime2: ISqlTypeFactoryWithScale;
 export declare var DateTimeOffset: ISqlTypeFactoryWithScale;
-export declare var SmallDateTime: ISqlTypeFactoryWithNoParams;
+export declare var SmallDateTime: ISqlTypeFactoryWithNoParams<Date>;
 export declare var Time: ISqlTypeFactoryWithScale;
 export declare var UniqueIdentifier: ISqlTypeFactoryWithNoParams;
 export declare var SmallMoney: ISqlTypeFactoryWithNoParams;
@@ -391,3 +391,11 @@ export declare class PreparedStatement extends events.EventEmitter {
 }
 
 export declare class PreparedStatementError extends MSSQLError {}
+
+/**
+ * Registers a custom value handler for the given type.
+ *
+ * @param type the type to handle
+ * @param handler the handler that converts the value
+ */
+export declare function registerValueHandler<T, O>(type: ISqlTypeFactory<T>, handler: (value: T) => O): void;
